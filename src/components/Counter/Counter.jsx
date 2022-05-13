@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import styles from './Counter.css';
+
+const initialCount = 0;
 
 const colors = {
   yellow: 'rgb(236, 222, 153)',
@@ -7,39 +9,69 @@ const colors = {
   red: 'rgb(239, 68, 68)',
 };
 
+function countReducer(counter, action) {
+  switch (action.type) {
+    case 'increment':
+      return counter + 1;
+    case 'decrement':
+      return counter - 1;
+    case 'reset':
+      return 0;
+    default:
+      return state;
+  }
+}
+
+function colorReducer(color, colorCondition) {
+  console.log(colorCondition);
+  switch (colorCondition.type) {
+    case 'color':
+      return (color = colorCondition.payload.color);
+    default:
+      throw Error('Unknown action type.');
+  }
+}
+
 export default function Counter() {
-  const [count, setCount] = useState(0);
-  const [currentColor, setCurrentColor] = useState(colors.yellow);
+  const [count, updater] = useReducer(countReducer, initialCount);
+  const [color, colorUpdate] = useReducer(colorReducer, colors.yellow);
+
+  // const [count, setCount] = useState(0);
+  // const [currentColor, setCurrentColor] = useState(colors.yellow);
 
   useEffect(() => {
     if (count === 0) {
-      setCurrentColor(colors.yellow);
+      // setCurrentColor(colors.yellow);
+      colorUpdate({ type: 'color', payload: { color: colors.yellow } });
     }
 
     if (count > 0) {
-      setCurrentColor(colors.green);
+      // setCurrentColor(colors.green);
+      colorUpdate({ type: 'color', payload: { color: colors.green } });
     }
 
     if (count < 0) {
-      setCurrentColor(colors.red);
+      // setCurrentColor(colors.red);
+      colorUpdate({ type: 'color', payload: { color: colors.red } });
     }
   }, [count]);
 
   const increment = () => {
-    setCount((prevState) => prevState + 1);
+    // setCount((prevState) => prevState + 1);
+    updater({ type: 'increment' });
   };
 
   const decrement = () => {
-    setCount((prevState) => prevState - 1);
+    updater({ type: 'decrement' });
   };
 
   const reset = () => {
-    setCount(0);
+    updater({ type: 'reset' });
   };
 
   return (
     <main className={styles.main}>
-      <h1 style={{ color: currentColor }}>{count}</h1>
+      <h1 style={{ color: color }}>{count}</h1>
       <div>
         <button
           type="button"
